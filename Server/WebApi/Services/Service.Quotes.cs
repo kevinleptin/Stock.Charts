@@ -1,7 +1,11 @@
+using System.Globalization;
+using System.Reflection;
 using System.Text.Json;
 using Azure;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
+using CsvHelper;
+using CsvHelper.Configuration;
 using Skender.Stock.Indicators;
 
 namespace WebApi.Services;
@@ -24,7 +28,8 @@ internal static class FetchQuotes
 
             if (quotes == null || quotes.Count == 0)
             {
-                return GetBackup();
+                //return GetBackup();
+                return GetBackupCSV("");
             }
 
             return quotes
@@ -33,8 +38,35 @@ internal static class FetchQuotes
         }
         catch
         {
-            return GetBackup();
+            return GetBackupCSV("");
+            //return GetBackup();
         }
+    }
+
+    private static IEnumerable<Quote> GetBackupCSV(string file_name)
+    {
+        string workingFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        file_name = Path.Combine(workingFolder, "rawdata", "opusdt_30min_20221116_351.csv");
+
+        var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+        {
+            Delimiter = ",",
+            BadDataFound = null,
+            HasHeaderRecord = true,
+            TrimOptions = TrimOptions.Trim,
+            MissingFieldFound = null,
+            IgnoreBlankLines = true
+        };
+
+        IEnumerable<Quote> result = null;
+        //string file_name = @"";
+        using (TextReader reader = new StreamReader(file_name))
+        using(CsvReader csv = new CsvReader(reader, config))
+        {
+            result = csv.GetRecords<Quote>().ToList();
+        }
+
+        return result.OrderBy(c => c.Date);
     }
 
     private static IEnumerable<Quote> GetBackup()
