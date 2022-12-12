@@ -46,7 +46,7 @@ internal static class FetchQuotes
     private static IEnumerable<Quote> GetBackupCSV(string file_name)
     {
         string workingFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        file_name = Path.Combine(workingFolder, "rawdata", "opusdt_30min_20221116_351.csv");
+        file_name = Path.Combine(workingFolder, "rawdata", "data.csv");
 
         var config = new CsvConfiguration(CultureInfo.InvariantCulture)
         {

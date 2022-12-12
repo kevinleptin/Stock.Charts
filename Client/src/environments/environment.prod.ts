@@ -2,5 +2,5 @@ import { EnvConfig } from './environment.interface';
 
 export const env: EnvConfig = {
   production: true,
-  api: 'https://stock-charts-api.azurewebsites.net'
+  api: 'http://api.douban1688.com'
 };
